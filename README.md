@@ -19,8 +19,8 @@ The goal of these challenges is to practice software development by building fun
 | #  | Project              | Description                                                              | Status           |
 | -- | -------------------- | ------------------------------------------------------------------------ | ---------------- |
 | 01 | 💰 Shared Savings    | Platform for creating group savings goals and tracking contributions.    | ✅ Completed     |
-| 02 | 📈 HabitFlow         | Habit and shared goal tracking with group progress monitoring.           | 🚧 In progress   |
-| 03 | Coming soon...       | New challenge.                                                           | ⏳                |
+| 02 | ⏳ Time Capsule      | An application to create a digital capsule with memories,programmed to be opened on a future date.          | 🚧 In progress   |
+| 03 |      |                                                        | ⏳                |
 
 ---
 
