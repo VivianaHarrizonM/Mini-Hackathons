@@ -5,7 +5,7 @@ export default function CategoryFilter({ categorias, categoriaActiva, onSelect }
         onClick={() => onSelect(null)}
         className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-full border whitespace-nowrap ${
           !categoriaActiva
-            ? 'bg-indigo text-lino border-indigo'
+            ? 'bg-forest text-cream border-forest'
             : 'border-ink/20 text-ink/70 hover:border-ink/40'
         }`}
       >
@@ -17,7 +17,7 @@ export default function CategoryFilter({ categorias, categoriaActiva, onSelect }
           onClick={() => onSelect(c.slug)}
           className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-full border whitespace-nowrap ${
             categoriaActiva === c.slug
-              ? 'bg-indigo text-lino border-indigo'
+              ? 'bg-forest text-cream border-forest'
               : 'border-ink/20 text-ink/70 hover:border-ink/40'
           }`}
         >

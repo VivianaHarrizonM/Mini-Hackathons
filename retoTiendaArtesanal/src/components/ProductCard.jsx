@@ -1,33 +1,34 @@
 import { Link } from 'react-router-dom'
+import ProductVisual from './ProductVisual'
 
 export default function ProductCard({ producto }) {
   return (
     <Link
       to={`/producto/${producto.slug}`}
-      className="group block bg-kraft-light border border-kraft rounded-sm p-3 relative hover:shadow-lg hover:-translate-y-0.5 transition-all"
+      className="group block bg-paper border border-ink/8 rounded-sm overflow-hidden hover:shadow-[0_12px_32px_-8px_rgba(28,26,23,0.2)] hover:-translate-y-1 transition-all duration-300"
     >
-      {/* "hoyito" de la etiqueta */}
-      <div className="absolute top-3 left-3 w-3 h-3 rounded-full bg-lino border border-ink/20" />
+      <div className="relative">
+        <ProductVisual producto={producto} className="aspect-[4/5]" iconClassName="w-16 h-16 sm:w-20 sm:h-20" />
 
-      <div
-        className="w-full aspect-square rounded-sm mb-3 mt-2"
-        style={{ backgroundColor: producto.imagenes[0] }}
-      />
+        {producto.tags?.[0] && (
+          <span className="absolute top-3 left-3 bg-cream/95 backdrop-blur-sm text-ink text-[10px] font-mono uppercase tracking-[0.12em] px-2.5 py-1 rounded-full shadow-sm">
+            {producto.tags[0]}
+          </span>
+        )}
+      </div>
 
-      {producto.tags?.[0] && (
-        <span className="inline-block bg-musgo text-lino text-[10px] font-mono uppercase tracking-wide px-2 py-0.5 rounded-full mb-2">
-          {producto.tags[0]}
-        </span>
-      )}
+      <div className="p-4">
+        <p className="text-[11px] uppercase tracking-[0.1em] text-ink/40 mb-1.5">{producto.artesano}</p>
+        <h3 className="font-display text-base text-ink leading-snug mb-2.5 group-hover:text-forest transition-colors">
+          {producto.nombre}
+        </h3>
 
-      <h3 className="font-display text-base text-ink leading-snug mb-1 group-hover:text-indigo">
-        {producto.nombre}
-      </h3>
-      <p className="text-xs text-ink/60 mb-3">{producto.artesano}</p>
-
-      <div className="flex items-center justify-between border-t border-ink/10 pt-2">
-        <span className="font-mono text-lg text-barro font-bold">${producto.precio}</span>
-        <span className="text-xs text-ink/50">★ {producto.calificacion}</span>
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-lg text-terra font-bold tracking-tight">${producto.precio}</span>
+          <span className="text-xs text-ink/45 flex items-center gap-1">
+            <span className="text-mustard">★</span> {producto.calificacion}
+          </span>
+        </div>
       </div>
     </Link>
   )

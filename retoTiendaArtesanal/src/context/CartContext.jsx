@@ -13,7 +13,7 @@ export function CartProvider({ children }) {
     localStorage.setItem(CART_KEY, JSON.stringify(items))
   }, [items])
 
-  function agregar(producto, cantidad = 1) {
+function agregar(producto, cantidad = 1) {
     setItems((prev) => {
       const existente = prev.find((i) => i.id === producto.id)
       if (existente) {
@@ -28,7 +28,7 @@ export function CartProvider({ children }) {
           slug: producto.slug,
           nombre: producto.nombre,
           precio: producto.precio,
-          imagen: producto.imagenes?.[0],
+          categoria: producto.categoria,
           artesano: producto.artesano,
           stock: producto.stock,
           cantidad,
