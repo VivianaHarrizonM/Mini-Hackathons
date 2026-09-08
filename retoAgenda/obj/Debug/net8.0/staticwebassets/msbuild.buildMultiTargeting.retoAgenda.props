@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/retoAgenda.props" />
+</Project>

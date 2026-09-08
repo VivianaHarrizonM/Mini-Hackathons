@@ -1,0 +1,57 @@
+﻿@page "/"
+@using retoAgenda.Services
+@inject EventoService EventoSvc
+
+<div class="agenda-container">
+    <h1>Mi Agenda</h1>
+
+    <CalendarioMensual MesActual="@_mesActual" FechaSeleccionada="@_fechaSeleccionada"
+                        OnDiaSeleccionado="SeleccionarDia"
+                        OnCambiarMes="CambiarMes" />
+
+    @if (_fechaSeleccionada is not null)
+    {
+        <div class="eventos-del-dia">
+            <h3>Eventos del @_fechaSeleccionada.Value.ToString("dd 'de' MMMM")</h3>
+            @{
+                var eventosDelDia = EventoSvc.ObtenerPorFecha(_fechaSeleccionada.Value);
+            }
+            @if (!eventosDelDia.Any())
+            {
+                <p class="sin-eventos">No hay eventos este día.</p>
+            }
+            else
+            {
+                <ul class="lista-eventos">
+                    @foreach (var ev in eventosDelDia.OrderBy(e => e.HoraInicio))
+                    {
+                        var categoria = EventoSvc.ObtenerCategoria(ev.CategoriaId);
+                        <li class="evento-item" style="border-left-color:@(categoria?.Color ?? "#999")">
+                            <span class="evento-hora">@ev.HoraInicio.ToString(@"hh\:mm")</span>
+                            <span class="evento-titulo">@ev.Titulo</span>
+                            @if (ev.EsRecordatorio)
+                            {
+                                <span class="badge-recordatorio">🔔</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private DateTime _mesActual = DateTime.Today;
+    private DateTime? _fechaSeleccionada = DateTime.Today;
+
+    private void SeleccionarDia(DateTime fecha)
+    {
+        _fechaSeleccionada = fecha;
+    }
+
+    private void CambiarMes(int delta)
+    {
+        _mesActual = _mesActual.AddMonths(delta);
+    }
+}
