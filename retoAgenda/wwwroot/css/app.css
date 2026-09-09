@@ -75,3 +75,435 @@
 code {
     color: #c02d76;
 }
+
+.agenda-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.calendario-mensual {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.calendario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.calendario-header h2 {
+    text-transform: capitalize;
+    margin: 0;
+}
+
+.btn-nav {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 4px 10px;
+}
+
+.dias-semana-header,
+.grid-dias {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.dia-semana-nombre {
+    text-align: center;
+    font-weight: bold;
+    padding: 4px;
+    color: #555;
+}
+
+.celda-dia {
+    min-height: 70px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.celda-dia:hover {
+    background: #f0f4ff;
+}
+
+.dia-fuera-mes {
+    color: #bbb;
+    background: #fafafa;
+}
+
+.dia-hoy {
+    border: 2px solid #3B82F6;
+}
+
+.dia-seleccionado {
+    background: #dbeafe;
+}
+
+.numero-dia {
+    font-weight: bold;
+}
+
+.puntos-eventos {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+}
+
+.punto-evento {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.punto-mas {
+    font-size: 10px;
+    color: #666;
+}
+
+.eventos-del-dia {
+    margin-top: 16px;
+}
+
+.lista-eventos {
+    list-style: none;
+    padding: 0;
+}
+
+.evento-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    margin-bottom: 6px;
+    border-left: 4px solid #999;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.evento-hora {
+    font-weight: bold;
+    color: #555;
+}
+
+.badge-recordatorio {
+    margin-left: auto;
+}
+
+.sin-eventos {
+    color: #888;
+    font-style: italic;
+}
+.tabs-vista {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.tab-activo {
+    background: #3B82F6;
+    color: white;
+    border-color: #3B82F6;
+}
+
+.calendario-semanal {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.semana-grid-header {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+
+.dia-columna-header {
+    text-align: center;
+    padding: 6px 0;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.dia-columna-header:hover {
+    background: #f0f4ff;
+}
+
+.dia-nombre {
+    text-transform: capitalize;
+    font-size: 12px;
+    color: #666;
+}
+
+.dia-numero {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.semana-timeline {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    position: relative;
+    border-top: 1px solid #eee;
+}
+
+.columna-horas {
+    display: flex;
+    flex-direction: column;
+}
+
+.etiqueta-hora {
+    font-size: 11px;
+    color: #999;
+    border-bottom: 1px solid #f0f0f0;
+    padding-top: 2px;
+}
+
+.dia-columna-eventos {
+    position: relative;
+    border-left: 1px solid #f0f0f0;
+}
+
+.evento-bloque {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    border-radius: 4px;
+    color: white;
+    font-size: 11px;
+    padding: 2px 4px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.evento-bloque-titulo {
+    display: block;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.agenda-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.btn-nuevo-evento {
+    background: #3B82F6;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-nuevo-evento:hover {
+    background: #2563eb;
+}
+
+.evento-item {
+    cursor: pointer;
+}
+
+.evento-item:hover {
+    background: #f0f0f0;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.modal-contenido {
+    background: white;
+    border-radius: 10px;
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-contenido h3 {
+    margin-top: 0;
+}
+
+.form-grupo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+    flex: 1;
+}
+
+.form-grupo label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.form-grupo input,
+.form-grupo select,
+.form-grupo textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+}
+
+.form-fila {
+    display: flex;
+    gap: 12px;
+}
+
+.form-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+}
+
+.form-error {
+    color: #dc2626;
+    font-size: 13px;
+    margin: -4px 0 12px;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.modal-acciones-derecha {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.btn-cancelar {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-guardar {
+    background: #3B82F6;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-eliminar {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.selector-hora-12 {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.selector-hora-12 select {
+    padding: 8px 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+}
+
+.separador-hora {
+    font-weight: bold;
+    color: #555;
+}
+.banner-recordatorios {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+.banner-titulo {
+    font-weight: bold;
+    color: #92400e;
+    margin-bottom: 8px;
+}
+
+.banner-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.banner-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-left: 4px solid #999;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.banner-item:hover {
+    background: #f9f9f9;
+}
+
+.banner-fecha {
+    font-weight: bold;
+    text-transform: capitalize;
+    font-size: 13px;
+    color: #555;
+    min-width: 70px;
+}
+
+.banner-hora {
+    font-size: 13px;
+    color: #777;
+    min-width: 45px;
+}
+
+.banner-evento-titulo {
+    font-weight: 500;
+}

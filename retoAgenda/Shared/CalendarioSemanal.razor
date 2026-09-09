@@ -1,0 +1,80 @@
+@using retoAgenda.Services
+@using retoAgenda.Models
+@inject EventoService EventoSvc
+
+@{
+    const int HoraBase = 7;  
+    const int HoraFinal = 22;
+    const int AlturaHora = 50;
+    var totalHoras = HoraFinal - HoraBase;
+}
+
+<div class="calendario-semanal">
+    <div class="calendario-header">
+        <button class="btn-nav" @onclick="() => OnCambiarSemana.InvokeAsync(-1)">◀</button>
+        <h2>@InicioSemana.ToString("dd MMM") - @InicioSemana.AddDays(6).ToString("dd MMM yyyy")</h2>
+        <button class="btn-nav" @onclick="() => OnCambiarSemana.InvokeAsync(1)">▶</button>
+    </div>
+
+    <div class="semana-grid-header">
+        <div class="columna-horas-header"></div>
+        @foreach (var dia in ObtenerDiasSemana())
+        {
+            var esHoy = dia.Date == DateTime.Today;
+            var esSeleccionado = FechaSeleccionada.HasValue && dia.Date == FechaSeleccionada.Value.Date;
+            <div class="dia-columna-header @(esHoy ? "dia-hoy" : "") @(esSeleccionado ? "dia-seleccionado" : "")"
+                 @onclick="() => OnDiaSeleccionado.InvokeAsync(dia)">
+                <div class="dia-nombre">@dia.ToString("ddd")</div>
+                <div class="dia-numero">@dia.Day</div>
+            </div>
+        }
+    </div>
+
+    <div class="semana-timeline" style="height:@(totalHoras * AlturaHora)px">
+        <div class="columna-horas">
+            @for (int h = HoraBase; h < HoraFinal; h++)
+            {
+                <div class="etiqueta-hora" style="height:@(AlturaHora)px">@h:00</div>
+            }
+        </div>
+
+        @foreach (var dia in ObtenerDiasSemana())
+        {
+            <div class="dia-columna-eventos">
+                @foreach (var ev in EventoSvc.ObtenerPorFecha(dia))
+                {
+                    var categoria = EventoSvc.ObtenerCategoria(ev.CategoriaId);
+                    var top = (ev.HoraInicio.TotalHours - HoraBase) * AlturaHora;
+                    var duracionHoras = (ev.HoraFin - ev.HoraInicio).TotalHours;
+                    var alto = Math.Max(duracionHoras * AlturaHora, 20);
+
+                    <div class="evento-bloque" style="top:@(top)px; height:@(alto)px; background-color:@(categoria?.Color ?? "#999")"
+                         title="@ev.Titulo (@ev.HoraInicio.ToString(@"hh\:mm") - @ev.HoraFin.ToString(@"hh\:mm"))">
+                        <span class="evento-bloque-titulo">@ev.Titulo</span>
+                        @if (ev.EsRecordatorio)
+                        {
+                            <span>🔔</span>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public DateTime InicioSemana { get; set; }
+    [Parameter] public DateTime? FechaSeleccionada { get; set; }
+    [Parameter] public EventCallback<DateTime> OnDiaSeleccionado { get; set; }
+    [Parameter] public EventCallback<int> OnCambiarSemana { get; set; }
+
+    private List<DateTime> ObtenerDiasSemana()
+    {
+        var dias = new List<DateTime>();
+        for (int i = 0; i < 7; i++)
+        {
+            dias.Add(InicioSemana.AddDays(i));
+        }
+        return dias;
+    }
+}

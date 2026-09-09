@@ -1,0 +1,167 @@
+@using retoAgenda.Services
+@using retoAgenda.Models
+@inject EventoService EventoSvc
+
+@if (Mostrar)
+{
+    <div class="modal-overlay" @onclick="Cancelar">
+        <div class="modal-contenido" @onclick:stopPropagation="true">
+            <h3>@(EsEdicion ? "Editar evento" : "Nuevo evento")</h3>
+
+            <div class="form-grupo">
+                <label>Título</label>
+                <input type="text" @bind="_titulo" placeholder="Ej. Reunión con cliente" />
+            </div>
+
+            <div class="form-grupo">
+                <label>Descripción</label>
+                <textarea @bind="_descripcion" rows="2" placeholder="Detalles (opcional)"></textarea>
+            </div>
+
+            <div class="form-fila">
+                <div class="form-grupo">
+                    <label>Fecha</label>
+                    <input type="date" @bind="_fecha" />
+                </div>
+                <div class="form-grupo">
+                    <label>Categoría</label>
+                    <select @bind="_categoriaId">
+                        @foreach (var cat in EventoSvc.Categorias)
+                        {
+                            <option value="@cat.Id">@cat.Nombre</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-fila">
+                <div class="form-grupo">
+                    <label>Hora inicio</label>
+                    <SelectorHora12 @bind-Valor="_horaInicio" />
+                </div>
+                <div class="form-grupo">
+                    <label>Hora fin</label>
+                    <SelectorHora12 @bind-Valor="_horaFin" />
+                </div>
+            </div>
+
+            <div class="form-grupo form-checkbox">
+                <label>
+                    <input type="checkbox" @bind="_esRecordatorio" />
+                    Marcar como recordatorio
+                </label>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <p class="form-error">@_error</p>
+            }
+
+            <div class="modal-acciones">
+                @if (EsEdicion)
+                {
+                    <button class="btn-eliminar" @onclick="Eliminar">Eliminar</button>
+                }
+                <div class="modal-acciones-derecha">
+                    <button class="btn-cancelar" @onclick="Cancelar">Cancelar</button>
+                    <button class="btn-guardar" @onclick="Guardar">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Mostrar { get; set; }
+    [Parameter] public Evento? EventoEditar { get; set; }
+    [Parameter] public DateTime FechaPorDefecto { get; set; } = DateTime.Today;
+    [Parameter] public EventCallback OnCerrar { get; set; }
+    [Parameter] public EventCallback OnGuardado { get; set; }
+
+    private bool EsEdicion => EventoEditar is not null;
+
+    private string _titulo = "";
+    private string _descripcion = "";
+    private DateTime _fecha;
+    private TimeOnly _horaInicio;
+    private TimeOnly _horaFin;
+    private int _categoriaId;
+    private bool _esRecordatorio;
+    private string? _error;
+
+    protected override void OnParametersSet()
+    {
+        _error = null;
+
+        if (EventoEditar is not null)
+        {
+            _titulo = EventoEditar.Titulo;
+            _descripcion = EventoEditar.Descripcion;
+            _fecha = EventoEditar.Fecha;
+            _horaInicio = TimeOnly.FromTimeSpan(EventoEditar.HoraInicio);
+            _horaFin = TimeOnly.FromTimeSpan(EventoEditar.HoraFin);
+            _categoriaId = EventoEditar.CategoriaId;
+            _esRecordatorio = EventoEditar.EsRecordatorio;
+        }
+        else
+        {
+            _titulo = "";
+            _descripcion = "";
+            _fecha = FechaPorDefecto;
+            _horaInicio = new TimeOnly(9, 0);
+            _horaFin = new TimeOnly(10, 0);
+            _categoriaId = EventoSvc.Categorias.FirstOrDefault()?.Id ?? 0;
+            _esRecordatorio = false;
+        }
+    }
+
+    private async Task Guardar()
+    {
+        if (string.IsNullOrWhiteSpace(_titulo))
+        {
+            _error = "El título es obligatorio.";
+            return;
+        }
+
+        if (_horaFin <= _horaInicio)
+        {
+            _error = "La hora de fin debe ser después de la hora de inicio.";
+            return;
+        }
+
+        var evento = new Evento
+        {
+            Id = EventoEditar?.Id ?? 0,
+            Titulo = _titulo.Trim(),
+            Descripcion = _descripcion.Trim(),
+            Fecha = _fecha.Date,
+            HoraInicio = _horaInicio.ToTimeSpan(),
+            HoraFin = _horaFin.ToTimeSpan(),
+            CategoriaId = _categoriaId,
+            EsRecordatorio = _esRecordatorio
+        };
+
+        if (EsEdicion)
+            await EventoSvc.ActualizarEventoAsync(evento);
+        else
+            await EventoSvc.AgregarEventoAsync(evento);
+
+        await OnGuardado.InvokeAsync();
+        await OnCerrar.InvokeAsync();
+    }
+
+    private async Task Eliminar()
+    {
+        if (EventoEditar is not null)
+        {
+            await EventoSvc.EliminarEventoAsync(EventoEditar.Id);
+            await OnGuardado.InvokeAsync();
+        }
+        await OnCerrar.InvokeAsync();
+    }
+
+    private async Task Cancelar()
+    {
+        await OnCerrar.InvokeAsync();
+    }
+}

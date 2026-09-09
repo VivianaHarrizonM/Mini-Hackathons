@@ -1,0 +1,67 @@
+@using retoAgenda.Services
+@using retoAgenda.Models
+@inject EventoService EventoSvc
+
+<div class="calendario-mensual">
+    <div class="calendario-header">
+        <button class="btn-nav" @onclick="() => OnCambiarMes.InvokeAsync(-1)">◀</button>
+        <h2>@MesActual.ToString("MMMM yyyy")</h2>
+        <button class="btn-nav" @onclick="() => OnCambiarMes.InvokeAsync(1)">▶</button>
+    </div>
+
+    <div class="dias-semana-header">
+        @foreach (var dia in new[] { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" })
+        {
+            <div class="dia-semana-nombre">@dia</div>
+        }
+    </div>
+
+    <div class="grid-dias">
+        @foreach (var dia in ObtenerDiasDelGrid())
+        {
+            var esDelMesActual = dia.Month == MesActual.Month;
+            var esHoy = dia.Date == DateTime.Today;
+            var esSeleccionado = FechaSeleccionada.HasValue && dia.Date == FechaSeleccionada.Value.Date;
+            var eventosDelDia = EventoSvc.ObtenerPorFecha(dia);
+
+            <div class="celda-dia @(esDelMesActual ? "" : "dia-fuera-mes") @(esHoy ? "dia-hoy" : "") @(esSeleccionado ? "dia-seleccionado" : "")"
+                 @onclick="() => OnDiaSeleccionado.InvokeAsync(dia)">
+                <span class="numero-dia">@dia.Day</span>
+                <div class="puntos-eventos">
+                    @foreach (var ev in eventosDelDia.Take(3))
+                    {
+                        var categoria = EventoSvc.ObtenerCategoria(ev.CategoriaId);
+                        <span class="punto-evento" style="background-color:@(categoria?.Color ?? "#999")"></span>
+                    }
+                    @if (eventosDelDia.Count > 3)
+                    {
+                        <span class="punto-mas">+@(eventosDelDia.Count - 3)</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public DateTime MesActual { get; set; }
+    [Parameter] public DateTime? FechaSeleccionada { get; set; }
+    [Parameter] public EventCallback<DateTime> OnDiaSeleccionado { get; set; }
+    [Parameter] public EventCallback<int> OnCambiarMes { get; set; }
+
+    private List<DateTime> ObtenerDiasDelGrid()
+    {
+        var primerDiaMes = new DateTime(MesActual.Year, MesActual.Month, 1);
+
+        // Lunes = 0 ... Domingo = 6 (para que la semana empiece en lunes)
+        int offset = ((int)primerDiaMes.DayOfWeek + 6) % 7;
+        var inicioGrid = primerDiaMes.AddDays(-offset);
+
+        var dias = new List<DateTime>();
+        for (int i = 0; i < 42; i++) // 6 semanas x 7 días, cubre cualquier mes
+        {
+            dias.Add(inicioGrid.AddDays(i));
+        }
+        return dias;
+    }
+}

@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets/icon-192.png"
     },
     {
+      "Id": "/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/wwwroot/icon.png",
+      "PackagePath": "staticwebassets/icon.png"
+    },
+    {
       "Id": "/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
     },

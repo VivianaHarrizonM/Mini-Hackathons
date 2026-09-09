@@ -30,8 +30,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L01haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/Pages/Home.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
+[/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/Shared/BannerRecordatorios.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0Jhbm5lclJlY29yZGF0b3Jpb3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/Shared/CalendarioMensual.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NhbGVuZGFyaW9NZW5zdWFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/Shared/CalendarioSemanal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NhbGVuZGFyaW9TZW1hbmFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/Shared/EventoFormulario.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0V2ZW50b0Zvcm11bGFyaW8ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/Shared/SelectorHora12.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1NlbGVjdG9ySG9yYTEyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/viviana-harrizon/Documentos/Hackathons/retoAgenda/_Imports.razor]

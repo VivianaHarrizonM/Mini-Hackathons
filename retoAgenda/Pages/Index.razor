@@ -3,11 +3,42 @@
 @inject EventoService EventoSvc
 
 <div class="agenda-container">
-    <h1>Mi Agenda</h1>
+@if (_cargando)
+{
+    <p>Cargando agenda...</p>
+}
+else
+{
+    <div class="agenda-header-top">
+        <h1>Mi Agenda</h1>
+        <button class="btn-nuevo-evento" @onclick="AbrirNuevoEvento">+ Nuevo evento</button>
+    </div>
 
-    <CalendarioMensual MesActual="@_mesActual" FechaSeleccionada="@_fechaSeleccionada"
-                        OnDiaSeleccionado="SeleccionarDia"
-                        OnCambiarMes="CambiarMes" />
+    <BannerRecordatorios OnRecordatorioClick="AbrirEditarEvento" />
+
+    <div class="tabs-vista">
+        <button class="tab-btn @(_vista == VistaCalendario.Mensual ? "tab-activo" : "")"
+                @onclick='() => _vista = VistaCalendario.Mensual'>
+            Mensual
+        </button>
+        <button class="tab-btn @(_vista == VistaCalendario.Semanal ? "tab-activo" : "")"
+                @onclick='() => _vista = VistaCalendario.Semanal'>
+            Semanal
+        </button>
+    </div>
+
+    @if (_vista == VistaCalendario.Mensual)
+    {
+        <CalendarioMensual MesActual="@_mesActual" FechaSeleccionada="@_fechaSeleccionada"
+                            OnDiaSeleccionado="SeleccionarDia"
+                            OnCambiarMes="CambiarMes" />
+    }
+    else
+    {
+        <CalendarioSemanal InicioSemana="@_inicioSemana" FechaSeleccionada="@_fechaSeleccionada"
+                            OnDiaSeleccionado="SeleccionarDia"
+                            OnCambiarSemana="CambiarSemana" />
+    }
 
     @if (_fechaSeleccionada is not null)
     {
@@ -26,7 +57,8 @@
                     @foreach (var ev in eventosDelDia.OrderBy(e => e.HoraInicio))
                     {
                         var categoria = EventoSvc.ObtenerCategoria(ev.CategoriaId);
-                        <li class="evento-item" style="border-left-color:@(categoria?.Color ?? "#999")">
+                        <li class="evento-item" style="border-left-color:@(categoria?.Color ?? "#999")"
+                            @onclick="() => AbrirEditarEvento(ev)">
                             <span class="evento-hora">@ev.HoraInicio.ToString(@"hh\:mm")</span>
                             <span class="evento-titulo">@ev.Titulo</span>
                             @if (ev.EsRecordatorio)
@@ -39,11 +71,33 @@
             }
         </div>
     }
+}
 </div>
 
+<EventoFormulario Mostrar="_mostrarFormulario"
+                   EventoEditar="_eventoEditando"
+                   FechaPorDefecto="@(_fechaSeleccionada ?? DateTime.Today)"
+                   OnCerrar="CerrarFormulario"
+                   OnGuardado="StateHasChanged" />
+
 @code {
+    private enum VistaCalendario { Mensual, Semanal }
+    private VistaCalendario _vista = VistaCalendario.Mensual;
+
     private DateTime _mesActual = DateTime.Today;
+    private DateTime _inicioSemana = ObtenerLunesDeLaSemana(DateTime.Today);
     private DateTime? _fechaSeleccionada = DateTime.Today;
+
+    private bool _mostrarFormulario;
+    private Models.Evento? _eventoEditando;
+
+    private bool _cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await EventoSvc.InicializarAsync();
+        _cargando = false;
+    }
 
     private void SeleccionarDia(DateTime fecha)
     {
@@ -53,5 +107,34 @@
     private void CambiarMes(int delta)
     {
         _mesActual = _mesActual.AddMonths(delta);
+    }
+
+    private void CambiarSemana(int delta)
+    {
+        _inicioSemana = _inicioSemana.AddDays(delta * 7);
+    }
+
+    private void AbrirNuevoEvento()
+    {
+        _eventoEditando = null;
+        _mostrarFormulario = true;
+    }
+
+    private void AbrirEditarEvento(Models.Evento evento)
+    {
+        _eventoEditando = evento;
+        _mostrarFormulario = true;
+    }
+
+    private void CerrarFormulario()
+    {
+        _mostrarFormulario = false;
+        _eventoEditando = null;
+    }
+
+    private static DateTime ObtenerLunesDeLaSemana(DateTime fecha)
+    {
+        int offset = ((int)fecha.DayOfWeek + 6) % 7;
+        return fecha.Date.AddDays(-offset);
     }
 }

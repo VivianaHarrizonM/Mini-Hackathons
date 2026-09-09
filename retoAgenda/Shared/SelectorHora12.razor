@@ -1,0 +1,64 @@
+<div class="selector-hora-12">
+    <select value="@_hora12" @onchange="OnHoraChanged">
+        @for (int h = 1; h <= 12; h++)
+        {
+            <option value="@h">@h</option>
+        }
+    </select>
+    <span class="separador-hora">:</span>
+    <select value="@_minuto.ToString("00")" @onchange="OnMinutoChanged">
+        @for (int m = 0; m < 60; m += 5)
+        {
+            <option value="@m.ToString("00")">@m.ToString("00")</option>
+        }
+    </select>
+    <select value="@_periodo" @onchange="OnPeriodoChanged">
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+    </select>
+</div>
+
+@code {
+    [Parameter] public TimeOnly Valor { get; set; }
+    [Parameter] public EventCallback<TimeOnly> ValorChanged { get; set; }
+
+    private int _hora12 = 12;
+    private int _minuto = 0;
+    private string _periodo = "AM";
+
+    protected override void OnParametersSet()
+    {
+        int hora24 = Valor.Hour;
+        _minuto = Valor.Minute - (Valor.Minute % 5); // redondea a múltiplo de 5
+        _periodo = hora24 >= 12 ? "PM" : "AM";
+        _hora12 = hora24 % 12;
+        if (_hora12 == 0) _hora12 = 12;
+    }
+
+    private async Task NotificarCambio()
+    {
+        int hora24 = _periodo == "AM"
+            ? (_hora12 == 12 ? 0 : _hora12)
+            : (_hora12 == 12 ? 12 : _hora12 + 12);
+
+        await ValorChanged.InvokeAsync(new TimeOnly(hora24, _minuto));
+    }
+
+    private Task OnHoraChanged(ChangeEventArgs e)
+    {
+        _hora12 = int.Parse(e.Value?.ToString() ?? "12");
+        return NotificarCambio();
+    }
+
+    private Task OnMinutoChanged(ChangeEventArgs e)
+    {
+        _minuto = int.Parse(e.Value?.ToString() ?? "0");
+        return NotificarCambio();
+    }
+
+    private Task OnPeriodoChanged(ChangeEventArgs e)
+    {
+        _periodo = e.Value?.ToString() ?? "AM";
+        return NotificarCambio();
+    }
+}

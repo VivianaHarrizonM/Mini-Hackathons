@@ -1,0 +1,43 @@
+@using retoAgenda.Services
+@using retoAgenda.Models
+@inject EventoService EventoSvc
+
+@{
+    var recordatorios = EventoSvc.ObtenerRecordatorios();
+}
+
+@if (recordatorios.Any())
+{
+    <div class="banner-recordatorios">
+        <div class="banner-titulo">🔔 Próximos recordatorios</div>
+        <div class="banner-lista">
+            @foreach (var ev in recordatorios)
+            {
+                var categoria = EventoSvc.ObtenerCategoria(ev.CategoriaId);
+                var etiquetaFecha = ObtenerEtiquetaFecha(ev.Fecha);
+
+                <div class="banner-item" style="border-left-color:@(categoria?.Color ?? "#999")"
+                     @onclick="() => OnRecordatorioClick.InvokeAsync(ev)">
+                    <span class="banner-fecha">@etiquetaFecha</span>
+                    <span class="banner-hora">@ev.HoraInicio.ToString(@"hh\:mm")</span>
+                    <span class="banner-evento-titulo">@ev.Titulo</span>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public EventCallback<Evento> OnRecordatorioClick { get; set; }
+
+    private string ObtenerEtiquetaFecha(DateTime fecha)
+    {
+        var dias = (fecha.Date - DateTime.Today).Days;
+        return dias switch
+        {
+            0 => "Hoy",
+            1 => "Mañana",
+            _ => fecha.ToString("dddd d")
+        };
+    }
+}
