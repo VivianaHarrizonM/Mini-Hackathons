@@ -16,3 +16,8 @@ app.frontend-url=http://localhost:5174
 jwt.secret=TU_JWT_SECRET
 jwt.expiration=86400000
 
+spring.mail.host=localhost
+spring.mail.port=1025
+spring.mail.properties.mail.smtp.auth=false
+spring.mail.properties.mail.smtp.starttls.enable=false
+mail.from=pedidos@hiloybarro.com

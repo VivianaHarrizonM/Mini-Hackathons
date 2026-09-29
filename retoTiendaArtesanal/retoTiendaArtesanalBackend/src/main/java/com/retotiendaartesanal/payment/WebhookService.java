@@ -2,6 +2,7 @@ package com.retotiendaartesanal.payment;
 
 import com.retotiendaartesanal.catalog.Product;
 import com.retotiendaartesanal.catalog.ProductRepository;
+import com.retotiendaartesanal.notification.EmailService;
 import com.retotiendaartesanal.order.Order;
 import com.retotiendaartesanal.order.OrderItem;
 import com.retotiendaartesanal.order.OrderRepository;
@@ -18,6 +19,7 @@ public class WebhookService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final EmailService emailService;
 
     @Transactional
     public void confirmarPagoPorSessionId(String stripeSessionId) {
@@ -54,5 +56,7 @@ public class WebhookService {
         orderRepository.save(order);
 
         log.info("Pedido {} confirmado como PAGADO vía webhook de Stripe", order.getId());
+
+        emailService.enviarConfirmacionPedido(order);
     }
 }
