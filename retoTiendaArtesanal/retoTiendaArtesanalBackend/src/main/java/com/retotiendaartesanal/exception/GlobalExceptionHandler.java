@@ -50,6 +50,10 @@ public class GlobalExceptionHandler {
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
       }
 
+      @ExceptionHandler(PedidoNoPagableException.class)
+      public ResponseEntity<Map<String, String>> handlePedidoNoPagable(PedidoNoPagableException ex) {
+          return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+      }
       @ExceptionHandler(ItemCarritoNoEncontradoException.class)
       public ResponseEntity<Map<String, String>> handleItemNoEncontrado(ItemCarritoNoEncontradoException ex) {
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));

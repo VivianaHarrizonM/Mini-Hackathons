@@ -18,11 +18,15 @@ The goal of these challenges is to practice software development by building fun
 
 | #  | Project              | Description                                                              | Status           |
 | -- | -------------------- | ------------------------------------------------------------------------ | ---------------- |
-| 01 | 💰 Shared Savings    | Platform for creating group savings goals and tracking contributions.    | ✅ Completed     |
-| 02 | ⏳ Time Capsule      | An application to create a digital capsule with memories,programmed to be opened on a future date.          | 🚧 In progress   |
-| 03 |      |                                                        | ⏳                |
+| 01 | 💰 Shared Savings | Platform to create group savings goals and track contributions. | ✅ Completed |
 
----
+| 02 | ⏳ Time Capsule | App to create a digital time capsule with memories, scheduled to be opened on a future date. | ✅ Completed |
+
+| 03 | 📅 My Planner | Planner with monthly and weekly views, color-coded categories, and visual reminders, built with Blazor WebAssembly. | ✅ Completed |
+
+| 04 | 🧶 Thread & Clay | Online store for Mexican handicrafts, with a catalog, shopping cart, ordering, and payments integrated with Stripe. | 🚧 In progress |
+
+------------------------------------------------------------------------------------------------------------------------
 
 ## 🛠️ Technologies
 
