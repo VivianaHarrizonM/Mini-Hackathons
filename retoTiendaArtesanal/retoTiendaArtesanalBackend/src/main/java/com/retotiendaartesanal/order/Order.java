@@ -57,4 +57,13 @@ public class Order {
 
     // Referencia a Stripe (se llena en el Paso 5)
     private String stripeSessionId;
+
+    @Column(nullable = false)
+    private boolean terminosAceptados;
+
+    @Column(nullable = false)
+    private String versionTerminosAceptada;
+
+    @Column(nullable = false)
+    private java.time.LocalDateTime fechaAceptacionTerminos;
 }

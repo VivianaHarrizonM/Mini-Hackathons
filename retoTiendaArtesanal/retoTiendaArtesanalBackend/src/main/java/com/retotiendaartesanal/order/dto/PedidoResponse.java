@@ -24,4 +24,6 @@ public class PedidoResponse {
     private String ciudad;
     private String estadoDireccion;
     private String codigoPostal;
+    private boolean terminosAceptados;
+    private String versionTerminosAceptada;
 }

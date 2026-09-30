@@ -29,65 +29,70 @@ public class OrderService {
     private final CartService cartService;
     private final CurrentUserProvider currentUserProvider;
 
+    
     @Transactional
     public PedidoResponse crearPedido(CrearPedidoRequest request) {
-        User user = currentUserProvider.getUsuarioActual();
+      User user = currentUserProvider.getUsuarioActual();
 
-        Cart cart = cartRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new CarritoVacioException("Tu carrito está vacío"));
+      Cart cart = cartRepository.findByUserId(user.getId())
+              .orElseThrow(() -> new CarritoVacioException("Tu carrito está vacío"));
 
-        if (cart.getItems().isEmpty()) {
-            throw new CarritoVacioException("Tu carrito está vacío");
-        }
+      if (cart.getItems().isEmpty()) {
+          throw new CarritoVacioException("Tu carrito está vacío");
+      }
 
-        // Validar stock disponible para cada item (sin descontarlo todavía)
-        for (CartItem item : cart.getItems()) {
-            if (item.getCantidad() > item.getProducto().getStock()) {
-                throw new StockInsuficienteException(
-                        "Stock insuficiente para '" + item.getProducto().getNombre() +
-                        "'. Disponible: " + item.getProducto().getStock());
-            }
-        }
+      // Validar stock disponible para cada item (sin descontarlo todavía)
+      for (CartItem item : cart.getItems()) {
+          if (item.getCantidad() > item.getProducto().getStock()) {
+              throw new StockInsuficienteException(
+                      "Stock insuficiente para '" + item.getProducto().getNombre() +
+                      "'. Disponible: " + item.getProducto().getStock());
+          }
+      }
 
-        Order order = Order.builder()
-                .user(user)
-                .estado(OrderStatus.PENDIENTE_PAGO)
-                .fechaCreacion(LocalDateTime.now())
-                .nombreDestinatario(request.getNombreDestinatario())
-                .telefono(request.getTelefono())
-                .direccion(request.getDireccion())
-                .ciudad(request.getCiudad())
-                .estadoDireccion(request.getEstadoDireccion())
-                .codigoPostal(request.getCodigoPostal())
-                .total(BigDecimal.ZERO)
-                .build();
+      Order order = Order.builder()
+              .user(user)
+              .estado(OrderStatus.PENDIENTE_PAGO)
+              .fechaCreacion(LocalDateTime.now())
+              .nombreDestinatario(request.getNombreDestinatario())
+              .telefono(request.getTelefono())
+              .direccion(request.getDireccion())
+              .ciudad(request.getCiudad())
+              .estadoDireccion(request.getEstadoDireccion())
+              .codigoPostal(request.getCodigoPostal())
+              .total(BigDecimal.ZERO)
+              .terminosAceptados(request.isAceptaTerminos())
+              .versionTerminosAceptada(com.retotiendaartesanal.legal.LegalContent.VERSION_VIGENTE)
+              .fechaAceptacionTerminos(LocalDateTime.now())
+              .build();
 
-        List<OrderItem> orderItems = cart.getItems().stream()
-                .map(item -> OrderItem.builder()
-                        .order(order)
-                        .productoId(item.getProducto().getId())
-                        .nombreProducto(item.getProducto().getNombre())
-                        .precioUnitario(item.getProducto().getPrecio())
-                        .cantidad(item.getCantidad())
-                        .build())
-                .toList();
+      List<OrderItem> orderItems = cart.getItems().stream()
+              .map(item -> OrderItem.builder()
+                      .order(order)
+                      .productoId(item.getProducto().getId())
+                      .nombreProducto(item.getProducto().getNombre())
+                      .precioUnitario(item.getProducto().getPrecio())
+                      .cantidad(item.getCantidad())
+                      .build())
+              .toList();
 
-        BigDecimal total = orderItems.stream()
-                .map(oi -> oi.getPrecioUnitario().multiply(BigDecimal.valueOf(oi.getCantidad())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+      BigDecimal total = orderItems.stream()
+              .map(oi -> oi.getPrecioUnitario()
+                      .multiply(BigDecimal.valueOf(oi.getCantidad())))
+              .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        order.setItems(orderItems);
-        order.setTotal(total);
+      order.setItems(orderItems);
+      order.setTotal(total);
 
-        orderRepository.save(order);
+      orderRepository.save(order);
 
-        // El carrito se vacía porque ya se "congeló" en el pedido.
-        // El stock NO se descuenta aquí — eso pasa solo cuando Stripe confirme el pago (Paso 6).
-        cartService.vaciarCarrito(cart);
+      // El carrito se vacía porque ya se "congeló" en el pedido.
+      // El stock NO se descuenta aquí — eso pasa solo cuando Stripe confirme el pago (Paso 6).
+      cartService.vaciarCarrito(cart);
 
-        return toResponse(order);
-    }
-
+      return toResponse(order);
+}
+    
     public List<PedidoResponse> listarPedidosDelUsuario() {
         User user = currentUserProvider.getUsuarioActual();
         return orderRepository.findByUserIdOrderByFechaCreacionDesc(user.getId())
@@ -124,6 +129,8 @@ public class OrderService {
                 .ciudad(order.getCiudad())
                 .estadoDireccion(order.getEstadoDireccion())
                 .codigoPostal(order.getCodigoPostal())
+                .terminosAceptados(order.isTerminosAceptados())              
+                .versionTerminosAceptada(order.getVersionTerminosAceptada()) 
                 .build();
     }
 }

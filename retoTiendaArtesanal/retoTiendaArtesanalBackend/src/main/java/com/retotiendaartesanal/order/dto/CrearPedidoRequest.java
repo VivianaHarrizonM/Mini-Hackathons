@@ -1,5 +1,7 @@
 package com.retotiendaartesanal.order.dto;
 
+
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -23,4 +25,7 @@ public class CrearPedidoRequest {
 
     @NotBlank(message = "El código postal es obligatorio")
     private String codigoPostal;
+
+    @AssertTrue(message = "Debes aceptar los términos y condiciones para continuar")
+    private boolean aceptaTerminos;
 }
