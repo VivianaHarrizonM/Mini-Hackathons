@@ -13,6 +13,7 @@ import com.retotiendaartesanal.order.dto.PedidoResponse;
 import com.retotiendaartesanal.security.CurrentUserProvider;
 import com.retotiendaartesanal.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -29,70 +31,78 @@ public class OrderService {
     private final CartService cartService;
     private final CurrentUserProvider currentUserProvider;
 
-    
     @Transactional
     public PedidoResponse crearPedido(CrearPedidoRequest request) {
-      User user = currentUserProvider.getUsuarioActual();
+        User user = currentUserProvider.getUsuarioActual();
 
-      Cart cart = cartRepository.findByUserId(user.getId())
-              .orElseThrow(() -> new CarritoVacioException("Tu carrito está vacío"));
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() -> {
+                    log.warn("Usuario {} intentó crear un pedido con carrito inexistente", user.getId());
+                    return new CarritoVacioException("Tu carrito está vacío");
+                });
 
-      if (cart.getItems().isEmpty()) {
-          throw new CarritoVacioException("Tu carrito está vacío");
-      }
+        if (cart.getItems().isEmpty()) {
+            log.warn("Usuario {} intentó crear un pedido con el carrito vacío", user.getId());
+            throw new CarritoVacioException("Tu carrito está vacío");
+        }
 
-      // Validar stock disponible para cada item (sin descontarlo todavía)
-      for (CartItem item : cart.getItems()) {
-          if (item.getCantidad() > item.getProducto().getStock()) {
-              throw new StockInsuficienteException(
-                      "Stock insuficiente para '" + item.getProducto().getNombre() +
-                      "'. Disponible: " + item.getProducto().getStock());
-          }
-      }
+        // Validar stock disponible para cada item (sin descontarlo todavía)
+        for (CartItem item : cart.getItems()) {
+            if (item.getCantidad() > item.getProducto().getStock()) {
+                log.warn("Stock insuficiente para producto {} (usuario {}): solicitado={}, disponible={}",
+                        item.getProducto().getId(), user.getId(), item.getCantidad(), item.getProducto().getStock());
+                throw new StockInsuficienteException(
+                        "Stock insuficiente para '" + item.getProducto().getNombre() +
+                        "'. Disponible: " + item.getProducto().getStock());
+            }
+        }
 
-      Order order = Order.builder()
-              .user(user)
-              .estado(OrderStatus.PENDIENTE_PAGO)
-              .fechaCreacion(LocalDateTime.now())
-              .nombreDestinatario(request.getNombreDestinatario())
-              .telefono(request.getTelefono())
-              .direccion(request.getDireccion())
-              .ciudad(request.getCiudad())
-              .estadoDireccion(request.getEstadoDireccion())
-              .codigoPostal(request.getCodigoPostal())
-              .total(BigDecimal.ZERO)
-              .terminosAceptados(request.isAceptaTerminos())
-              .versionTerminosAceptada(com.retotiendaartesanal.legal.LegalContent.VERSION_VIGENTE)
-              .fechaAceptacionTerminos(LocalDateTime.now())
-              .build();
+        Order order = Order.builder()
+                .user(user)
+                .estado(OrderStatus.PENDIENTE_PAGO)
+                .fechaCreacion(LocalDateTime.now())
+                .nombreDestinatario(request.getNombreDestinatario())
+                .telefono(request.getTelefono())
+                .direccion(request.getDireccion())
+                .ciudad(request.getCiudad())
+                .estadoDireccion(request.getEstadoDireccion())
+                .codigoPostal(request.getCodigoPostal())
+                .total(BigDecimal.ZERO)
+                .terminosAceptados(request.isAceptaTerminos())
+                .versionTerminosAceptada(com.retotiendaartesanal.legal.LegalContent.VERSION_VIGENTE)
+                .fechaAceptacionTerminos(LocalDateTime.now())
+                .build();
 
-      List<OrderItem> orderItems = cart.getItems().stream()
-              .map(item -> OrderItem.builder()
-                      .order(order)
-                      .productoId(item.getProducto().getId())
-                      .nombreProducto(item.getProducto().getNombre())
-                      .precioUnitario(item.getProducto().getPrecio())
-                      .cantidad(item.getCantidad())
-                      .build())
-              .toList();
+        List<OrderItem> orderItems = cart.getItems().stream()
+                .map(item -> OrderItem.builder()
+                        .order(order)
+                        .productoId(item.getProducto().getId())
+                        .nombreProducto(item.getProducto().getNombre())
+                        .precioUnitario(item.getProducto().getPrecio())
+                        .cantidad(item.getCantidad())
+                        .build())
+                .toList();
 
-      BigDecimal total = orderItems.stream()
-              .map(oi -> oi.getPrecioUnitario()
-                      .multiply(BigDecimal.valueOf(oi.getCantidad())))
-              .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal total = orderItems.stream()
+                .map(oi -> oi.getPrecioUnitario()
+                        .multiply(BigDecimal.valueOf(oi.getCantidad())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-      order.setItems(orderItems);
-      order.setTotal(total);
+        order.setItems(orderItems);
+        order.setTotal(total);
 
-      orderRepository.save(order);
+        orderRepository.save(order);
 
-      // El carrito se vacía porque ya se "congeló" en el pedido.
-      // El stock NO se descuenta aquí — eso pasa solo cuando Stripe confirme el pago (Paso 6).
-      cartService.vaciarCarrito(cart);
+        // El carrito se vacía porque ya se "congeló" en el pedido.
+        // El stock NO se descuenta aquí — eso pasa solo cuando Stripe confirme el pago (Paso 6).
+        cartService.vaciarCarrito(cart);
 
-      return toResponse(order);
-}
-    
+        log.info("Pedido {} creado para usuario {} con {} items, total={}",
+                order.getId(), user.getId(), orderItems.size(), total);
+
+        return toResponse(order);
+    }
+
     public List<PedidoResponse> listarPedidosDelUsuario() {
         User user = currentUserProvider.getUsuarioActual();
         return orderRepository.findByUserIdOrderByFechaCreacionDesc(user.getId())
@@ -102,7 +112,10 @@ public class OrderService {
     public PedidoResponse obtenerPedido(Long id) {
         User user = currentUserProvider.getUsuarioActual();
         Order order = orderRepository.findByIdAndUserId(id, user.getId())
-                .orElseThrow(() -> new PedidoNoEncontradoException("Pedido no encontrado: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Usuario {} intentó acceder a pedido {} inexistente o ajeno", user.getId(), id);
+                    return new PedidoNoEncontradoException("Pedido no encontrado: " + id);
+                });
         return toResponse(order);
     }
 
@@ -129,8 +142,6 @@ public class OrderService {
                 .ciudad(order.getCiudad())
                 .estadoDireccion(order.getEstadoDireccion())
                 .codigoPostal(order.getCodigoPostal())
-                .terminosAceptados(order.isTerminosAceptados())              
-                .versionTerminosAceptada(order.getVersionTerminosAceptada()) 
                 .build();
     }
 }

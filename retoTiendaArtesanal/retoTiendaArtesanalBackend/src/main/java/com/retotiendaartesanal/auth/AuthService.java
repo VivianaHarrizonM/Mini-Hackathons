@@ -11,6 +11,7 @@ import com.retotiendaartesanal.security.JwtService;
 import com.retotiendaartesanal.user.User;
 import com.retotiendaartesanal.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -30,6 +32,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
+            log.warn("Intento de registro con email ya existente: {}", request.getEmail());
             throw new EmailYaRegistradoException("Ya existe una cuenta con ese email");
         }
 
@@ -44,6 +47,8 @@ public class AuthService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtService.generateToken(userDetails);
 
+        log.info("Nuevo usuario registrado: id={}, email={}", user.getId(), user.getEmail());
+
         return new AuthResponse(token, user.getId(), user.getNombre(), user.getEmail());
     }
 
@@ -53,14 +58,20 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
         } catch (BadCredentialsException e) {
+            log.warn("Intento de login fallido para email: {}", request.getEmail());
             throw new CredencialesInvalidasException("Email o contraseña incorrectos");
         }
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new CredencialesInvalidasException("Email o contraseña incorrectos"));
+                .orElseThrow(() -> {
+                    log.warn("Login autenticado pero usuario no encontrado en BD: {}", request.getEmail());
+                    return new CredencialesInvalidasException("Email o contraseña incorrectos");
+                });
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtService.generateToken(userDetails);
+
+        log.info("Login exitoso: id={}, email={}", user.getId(), user.getEmail());
 
         return new AuthResponse(token, user.getId(), user.getNombre(), user.getEmail());
     }
