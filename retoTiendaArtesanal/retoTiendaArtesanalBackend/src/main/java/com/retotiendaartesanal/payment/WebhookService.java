@@ -23,10 +23,7 @@ public class WebhookService {
 
     @Transactional
     public void confirmarPagoPorSessionId(String stripeSessionId) {
-        Order order = orderRepository.findAll().stream()
-                .filter(o -> stripeSessionId.equals(o.getStripeSessionId()))
-                .findFirst()
-                .orElse(null);
+                Order order = orderRepository.findByStripeSessionId(stripeSessionId).orElse(null);
 
         if (order == null) {
             log.warn("Webhook recibido para una sesión de Stripe sin pedido asociado: {}", stripeSessionId);
