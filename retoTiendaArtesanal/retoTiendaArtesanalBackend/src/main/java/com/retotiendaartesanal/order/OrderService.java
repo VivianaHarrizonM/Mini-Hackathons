@@ -120,28 +120,30 @@ public class OrderService {
     }
 
     private PedidoResponse toResponse(Order order) {
-        List<PedidoItemResponse> items = order.getItems().stream()
-                .map(oi -> PedidoItemResponse.builder()
-                        .productoId(oi.getProductoId())
-                        .nombreProducto(oi.getNombreProducto())
-                        .precioUnitario(oi.getPrecioUnitario())
-                        .cantidad(oi.getCantidad())
-                        .subtotal(oi.getPrecioUnitario().multiply(BigDecimal.valueOf(oi.getCantidad())))
-                        .build())
-                .toList();
+    List<PedidoItemResponse> items = order.getItems().stream()
+            .map(oi -> PedidoItemResponse.builder()
+                    .productoId(oi.getProductoId())
+                    .nombreProducto(oi.getNombreProducto())
+                    .precioUnitario(oi.getPrecioUnitario())
+                    .cantidad(oi.getCantidad())
+                    .subtotal(oi.getPrecioUnitario().multiply(BigDecimal.valueOf(oi.getCantidad())))
+                    .build())
+            .toList();
 
-        return PedidoResponse.builder()
-                .id(order.getId())
-                .estado(order.getEstado())
-                .total(order.getTotal())
-                .fechaCreacion(order.getFechaCreacion())
-                .items(items)
-                .nombreDestinatario(order.getNombreDestinatario())
-                .telefono(order.getTelefono())
-                .direccion(order.getDireccion())
-                .ciudad(order.getCiudad())
-                .estadoDireccion(order.getEstadoDireccion())
-                .codigoPostal(order.getCodigoPostal())
-                .build();
+    return PedidoResponse.builder()
+            .id(order.getId())
+            .estado(order.getEstado())
+            .total(order.getTotal())
+            .fechaCreacion(order.getFechaCreacion())
+            .items(items)
+            .nombreDestinatario(order.getNombreDestinatario())
+            .telefono(order.getTelefono())
+            .direccion(order.getDireccion())
+            .ciudad(order.getCiudad())
+            .estadoDireccion(order.getEstadoDireccion())
+            .codigoPostal(order.getCodigoPostal())
+            .terminosAceptados(order.isTerminosAceptados())
+            .versionTerminosAceptada(order.getVersionTerminosAceptada())
+            .build();
     }
 }
