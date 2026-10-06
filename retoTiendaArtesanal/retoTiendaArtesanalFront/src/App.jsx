@@ -7,6 +7,7 @@ import Checkout from './pages/Checkout'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import PedidoDetalle from './pages/PedidoDetalle'
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Register />} />
         <Route path="/perfil" element={<Profile />} />
+        <Route path="/pedidos/:id" element={<PedidoDetalle />} />
       </Routes>
     </div>
   )
