@@ -115,7 +115,21 @@ export default function Checkout() {
                 onChange={(e) => setAceptaTerminos(e.target.checked)}
                 className="mt-0.5"
               />
-              <span>Acepto los términos y condiciones y la política de devoluciones.</span>
+              <span>
+                Acepto los{' '}
+                <Link to="/legal/terminos" target="_blank" rel="noopener noreferrer" className="text-forest underline">
+                  términos y condiciones
+                </Link>{' '}
+                y la{' '}
+                <Link to="/legal/devoluciones" target="_blank" rel="noopener noreferrer" className="text-forest underline">
+                  política de devoluciones
+                </Link>
+                , y he leído el{' '}
+                <Link to="/legal/privacidad" target="_blank" rel="noopener noreferrer" className="text-forest underline">
+                  aviso de privacidad
+                </Link>
+                .
+              </span>
             </label>
           </div>
 

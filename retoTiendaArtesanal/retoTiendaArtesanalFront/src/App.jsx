@@ -8,12 +8,15 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
 import PedidoDetalle from './pages/PedidoDetalle'
+import Legal from './pages/Legal'
+import Footer from './components/Footer'
 
 export default function App() {
   return (
     <div className="min-h-screen bg-lino">
       <Navbar />
       <Routes>
+
         <Route path="/" element={<Home />} />
         <Route path="/producto/:slug" element={<ProductDetail />} />
         <Route path="/carrito" element={<Cart />} />
@@ -22,7 +25,9 @@ export default function App() {
         <Route path="/registro" element={<Register />} />
         <Route path="/perfil" element={<Profile />} />
         <Route path="/pedidos/:id" element={<PedidoDetalle />} />
+        <Route path="/legal/:tipo" element={<Legal />} />
       </Routes>
+       <Footer />
     </div>
   )
 }
