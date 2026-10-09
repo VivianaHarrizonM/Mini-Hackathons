@@ -1,16 +1,48 @@
-# React + Vite
+# Hilo & Barro 
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Tienda en línea de artesanías mexicanas hechas a mano. Interfaz en React que consume la API del repositorio hermano `retoTiendaArtesanalBackend`.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+React 19 · Vite 8 · React Router 7 · Tailwind CSS 3 · Oxlint
 
-## React Compiler
+## Qué incluye
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Catálogo con búsqueda y filtro por categoría, y detalle de producto
+- Registro e inicio de sesión (JWT guardado en el navegador)
+- Carrito y checkout con dirección de envío y aceptación de términos
+- **Pago con Stripe Checkout:** la app nunca ve ni guarda datos de tarjeta
+- Pantalla de resultado del pago (`/pedidos/:id?pago=exito|cancelado`) que espera la confirmación del webhook, con opción de reintentar el pago
+- Historial de pedidos con su estado (pendiente, pagado, cancelado)
+- Términos y condiciones, aviso de privacidad y política de devoluciones
 
-## Expanding the Oxlint configuration
+## Cómo correrlo
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Primero levanta el backend (ver su README). Después:
+
+```bash
+npm install
+npm run dev
+```
+
+La app corre en <http://localhost:5173>. Ese puerto debe coincidir con `app.frontend-url` y con el CORS del backend.
+
+Si el backend no está en `http://localhost:8080`, crea un archivo `.env.local` con:
+
+```
+VITE_API_URL=http://localhost:8080
+```
+
+## Scripts
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Compilación de producción en `dist/` |
+| `npm run preview` | Sirve la compilación (usa `-- --port 5173` para que coincida con el CORS) |
+| `npm run lint` | Revisión con Oxlint |
+
+## Notas
+
+- En modo desarrollo React ejecuta los efectos dos veces (StrictMode), por eso verás peticiones `GET` duplicadas en la pestaña Network; en la compilación de producción salen una sola vez.
+- El carrito se guarda en el navegador y se copia al backend justo antes de pagar.
